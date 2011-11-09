@@ -1,6 +1,20 @@
 = lord_bowser
 
-Description goes here.
+http://www.mariowiki.com/images/thumb/7/76/BowserNSMBWii.png/377px-BowserNSMBWii.png
+
+== Usage
+
+Simply include LordBowser into your controller as such:
+
+   class MyController
+     include LordBowser
+
+     def make_sure_browser_is_awesome
+       unless browser.is?('firefox >= 4', 'chrome', 'opera')
+         redirect_to("http://youareanidiot.com")
+       end
+     end
+   end
 
 == Contributing to lord_bowser
  
