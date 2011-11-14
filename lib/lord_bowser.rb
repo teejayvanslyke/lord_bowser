@@ -30,21 +30,42 @@ module LordBowser
       end
     end
 
+    BROWSER_EXPRESSION = /^(\w+) ([\<\>\=]+) ([\d\.]+)$/.freeze
+
+    def parse(expr)
+      if expr.match(BROWSER_EXPRESSION)
+        return { vendor: $~[1].intern, operator: $~[2].intern, version: $~[3].to_f }
+      elsif expr.match(/^(\w+)$/)
+        return { vendor: $~[1].intern }
+      else
+        return nil
+      end
+    end
+
     def is?(*args)
       args.select do |arg|
-        if arg.match(/^(\w+) ([\<\>\=]+) ([\d\.]+)$/)
-          vendor  = $~[1].intern
-          op      = $~[2]
-          version = $~[3].to_f
-
-          self.vendor == vendor && self.send(op.intern, version)
-        elsif arg.match(/^(\w+)$/)
-          vendor  = $~[1].intern
-          self.vendor == vendor
-        else
+        data = parse(arg)
+        if data.nil?
           false
+        elsif [ :vendor, :operator, :version ].all? {|k| data.has_key?(k) }
+          self.vendor == data[:vendor] && self.send(data[:operator], data[:version])
+        elsif data.has_key?(:vendor)
+          self.vendor == data[:vendor]
         end
       end.size > 0
+    end
+
+    def is_not?(*args)
+      args.select do |arg|
+        data = parse(arg)
+        if data.nil?
+          false
+        elsif [ :vendor, :operator, :version ].all? {|k| data.has_key?(k) }
+          self.vendor == data[:vendor] && self.send(data[:operator].intern, data[:version])
+        elsif data.has_key?(:vendor)
+          self.vendor == data[:vendor]
+        end
+      end.size == 0
     end
 
     def >=(version)
@@ -53,6 +74,14 @@ module LordBowser
 
     def >(version)
       @version > version
+    end
+
+    def <=(version)
+      @version <= version
+    end
+
+    def <(version)
+      @version < version
     end
 
     attr_reader :vendor, :version, :user_agent

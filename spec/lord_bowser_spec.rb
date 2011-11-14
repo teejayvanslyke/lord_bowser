@@ -21,11 +21,13 @@ describe LordBowser do
     specify { browser.version.should == 6 }
     specify { browser.is?('firefox >= 5').should be_true }
     specify { browser.is?('firefox >= 5', 'ie > 6').should be_true }
+    specify { browser.is_not?('ie < 8').should be_true }
   end
 
   when_user_agent "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0" do
     specify { browser.vendor.should == :firefox }
     specify { browser.version.should == 5 }
+    specify { browser.is_not?('ie < 8', 'firefox > 6').should be_true }
   end
 
   when_user_agent "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0b8pre) Gecko/20101114 Firefox/4.0b8pre" do
@@ -36,6 +38,7 @@ describe LordBowser do
   when_user_agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.186 Safari/535.1" do
     specify { browser.vendor.should == :chrome }
     specify { browser.version.should == 14 }
+    specify { browser.is_not?('ie < 8', 'firefox < 6').should be_true }
   end
 
   when_user_agent "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)" do
@@ -48,6 +51,8 @@ describe LordBowser do
     specify { browser.vendor.should == :ie }
     specify { browser.version.should == 6 }
     specify { browser.is?('chrome').should be_false }
+    specify { browser.is_not?('chrome > 8').should be_true }
+    specify { browser.is_not?('ie < 8', 'firefox < 6').should be_false }
   end
 
   when_user_agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; da-dk) AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1" do
