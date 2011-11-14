@@ -70,6 +70,11 @@ describe LordBowser do
     specify { browser.version.should == 9 }
   end
 
+  when_user_agent "Something Else" do
+    specify { browser.is?('chrome').should be_false }
+    specify { browser.is_not?('ie < 8', 'firefox < 6').should be_true }
+  end
+
   class MockController
     include LordBowser 
 
